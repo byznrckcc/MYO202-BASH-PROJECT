@@ -16,6 +16,7 @@ if [[ "$OSTYPE" == *"msys"* || "$OSTYPE" == *"cygwin"* || "$(uname)" == *"MINGW"
     echo "--- Windows Donanim Detaylari ---" >> "$cikti"
     wmic cpu get name | grep -v "Name" | grep . >> "$cikti" 2>&1
     wmic computersystem get totalphysicalmemory | grep -v "Total" | grep . >> "$cikti" 2>&1
+    wmic baseboard get manufacturer,product | grep -v "Product" | grep . >> "$cikti" 2>&1
     wmic csproduct get uuid | grep -v "UUID" | grep . >> "$cikti" 2>&1
     wmic diskdrive get model,serialnumber,size | grep -v "Model" | grep . >> "$cikti" 2>&1
     getmac >> "$cikti" 2>&1
@@ -30,6 +31,8 @@ else
     echo "--- Linux Donanim Detaylari ---" >> "$cikti"
     lscpu | grep "Model name" | awk -F: '{print $2}' | xargs >> "$cikti"
     free -h | grep "Mem:" | awk '{print "RAM Kapasite: " $2}' >> "$cikti"
+    cat /sys/class/dmi/id/board_vendor 2>/dev/null | xargs >> "$cikti"
+    cat /sys/class/dmi/id/board_name 2>/dev/null | xargs >> "$cikti"
     cat /sys/class/dmi/id/product_uuid >> "$cikti" 2>/dev/null || echo "UUID erisimi yok" >> "$cikti"
     lsblk -d -o NAME,MODEL,SERIAL,SIZE | grep -v "NAME" >> "$cikti"
     ip link | grep ether | awk '{print "MAC: " $2}' >> "$cikti"
